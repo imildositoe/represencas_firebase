@@ -1,6 +1,8 @@
 package com.example.root.re_presencas.login;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +11,9 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -48,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
     private DatabaseReference raiz;
     public static final String PR_LOGADO = "professor_logado";
     public static final String EST_LOGADO = "estudante_logado";
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,12 @@ public class LoginActivity extends AppCompatActivity {
         this.loginHelp();
 
         this.auth();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
     }
 
     private void auth() {
@@ -111,12 +123,11 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * Class will execute jobs during authentication
      */
+    @SuppressLint("StaticFieldLeak")
     private class MyTask extends AsyncTask<Void, Void, Void> {
 
-        private ProgressDialog progressDialog;
-
         MyTask() {
-            this.progressDialog = new ProgressDialog(LoginActivity.this);
+            progressDialog = new ProgressDialog(LoginActivity.this);
         }
 
         @Override
@@ -146,6 +157,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 if (email.equals(docente.getEmail()) && senha.equals(docente.getSenha())) {
                                     flag = true;
+                                    break;
                                 }
                             }
                             if (flag) {
@@ -179,6 +191,7 @@ public class LoginActivity extends AppCompatActivity {
                                 assert estudante != null;
                                 if (email.equals(estudante.getEmail()) && senha.equals(estudante.getSenha())) {
                                     flag = true;
+                                    break;
                                 }
                             }
                             if (flag) {
@@ -200,12 +213,27 @@ public class LoginActivity extends AppCompatActivity {
                     });
 
                 } else {
-                    edtUsuario.setError("Campo obrigatório");
-                    edtSenha.setError("Campo obrigatório");
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            edtUsuario.setError("Campo obrigatório");
+                            edtSenha.setError("Campo obrigatório");
+                        }
+                    });
                 }
             } else {
-                Toast.makeText(LoginActivity.this, "Active os dados móveis ou conecte-se a uma rede WI-FI",
-                        Toast.LENGTH_SHORT).show();
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LoginActivity.this, "Active os dados móveis ou conecte-se a uma rede WI-FI", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
 
             return null;
