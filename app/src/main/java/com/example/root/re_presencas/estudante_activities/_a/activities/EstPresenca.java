@@ -23,7 +23,7 @@ public class EstPresenca extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_est_presenca);
-        setTitle("Presenças") ;
+        setTitle("Presenças");
         tabLayout = findViewById(R.id.est_pres_tab_layout);
         viewPager = findViewById(R.id.est_pres_view_pager);
 

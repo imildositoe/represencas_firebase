@@ -1,4 +1,4 @@
-package com.example.root.re_presencas;
+package com.example.root.re_presencas.recycler_bin;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -11,6 +11,8 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.example.root.re_presencas.R;
 import com.example.root.re_presencas.databinding.ContentMainBinding;
 import android.view.View;
 import android.view.ViewAnimationUtils;

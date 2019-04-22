@@ -15,10 +15,8 @@ import android.os.CancellationSignal;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -234,8 +232,6 @@ public class EstPresencasMarcacaoFragment extends Fragment {
 
     @TargetApi(Build.VERSION_CODES.M)
     private void startFingerPrint() {
-        Toast.makeText(getContext(), "Coloque o dedo no sensor para marcar a presença!", Toast.LENGTH_LONG).show();
-
         if (checkFingerPrintSettings()) {
             FingerPrintAuthenticator authenticator = FingerPrintAuthenticator.getInstanece();
 
@@ -274,7 +270,6 @@ public class EstPresencasMarcacaoFragment extends Fragment {
         @Override
         public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
-
             savePresenca();
         }
 
