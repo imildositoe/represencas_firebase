@@ -27,7 +27,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mainBinding = DataBindingUtil.setContentView(this, R.layout.content_main);
 
-        this.nextAction();
+        //this.nextAction();
+
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 delayedAuth();
 
             }
-        }, 100);
+        }, 0);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -89,10 +92,9 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+
             }
-        }, 500);
+        }, 0);
     }
 
     private int getFinalWidth() {

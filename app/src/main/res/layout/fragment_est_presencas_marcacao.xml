@@ -16,7 +16,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/tv_cadeira_est_marc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -27,7 +27,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/tv_periodo_est_marc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -35,9 +35,9 @@
                 android:text="Pos-Laboral"
                 android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
                 app:layout_constraintBottom_toTopOf="@+id/guideline7"
-                app:layout_constraintEnd_toEndOf="@+id/textView10"
-                app:layout_constraintStart_toStartOf="@+id/textView10"
-                app:layout_constraintTop_toBottomOf="@+id/textView10" />
+                app:layout_constraintEnd_toEndOf="@+id/tv_cadeira_est_marc"
+                app:layout_constraintStart_toStartOf="@+id/tv_cadeira_est_marc"
+                app:layout_constraintTop_toBottomOf="@+id/tv_cadeira_est_marc" />
 
             <android.support.constraint.Guideline
                 android:id="@+id/guideline7"
@@ -47,7 +47,7 @@
                 app:layout_constraintGuide_begin="90dp" />
 
             <TextView
-                android:id="@+id/textView12"
+                android:id="@+id/tv_nome_est_marc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -67,7 +67,7 @@
                 app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/img_finger"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_marginTop="8dp"
@@ -106,7 +106,7 @@
                 app:layout_constraintGuide_begin="304dp" />
 
             <Switch
-                android:id="@+id/switch1"
+                android:id="@+id/sw_is_marcado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"

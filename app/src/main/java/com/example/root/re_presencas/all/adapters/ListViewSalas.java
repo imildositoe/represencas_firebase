@@ -18,7 +18,6 @@ public class ListViewSalas extends ArrayAdapter<Sala> {
 
     private Activity context;
     private List<Sala> mData;
-    ConstraintLayout item_sala;
 
     public ListViewSalas(Activity context, List<Sala> mData) {
         super(context, R.layout.row_sala, mData);
@@ -35,7 +34,6 @@ public class ListViewSalas extends ArrayAdapter<Sala> {
 
         TextView tvSala = view.findViewById(R.id.tv_sala);
         TextView tvBloco = view.findViewById(R.id.tv_bloco);
-        item_sala = view.findViewById(R.id.sala_item_id);
 
         String sala = "Sala  " + mData.get(position).getDesignacao();
         String bloco = "Bloco  " + mData.get(position).getDesignacao().charAt(0);

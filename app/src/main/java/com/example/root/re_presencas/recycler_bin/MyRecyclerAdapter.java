@@ -2,7 +2,6 @@ package com.example.root.re_presencas.recycler_bin;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,8 +63,8 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
 
         ViewHolder(View itemView) {
             super(itemView);
-            tvSala = itemView.findViewById(R.id.tv_sala);
-            tvBloco = itemView.findViewById(R.id.tv_bloco);
+            tvSala = itemView.findViewById(R.id.tv_nome_estudante_marcacao);
+            tvBloco = itemView.findViewById(R.id.tv_is_presente_marcacao);
 //            item_sala = itemView.findViewById(R.id.sala_item_id);
         }
 

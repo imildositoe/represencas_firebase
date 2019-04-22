@@ -1,12 +1,9 @@
 package com.example.root.re_presencas.all.adapters;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,12 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.root.re_presencas.R;
 import com.example.root.re_presencas.components.Components;
 import com.example.root.re_presencas.model.Sala;
-import com.example.root.re_presencas.professor_activities.activities.ProfControleEstatisticasPresenca;
 
 import java.util.List;
 
@@ -97,8 +92,8 @@ public class RecyclerSalas extends RecyclerView.Adapter<RecyclerSalas.MyViewHold
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvSala = itemView.findViewById(R.id.tv_sala);
-            tvBloco = itemView.findViewById(R.id.tv_bloco);
+            tvSala = itemView.findViewById(R.id.tv_nome_estudante_marcacao);
+            tvBloco = itemView.findViewById(R.id.tv_is_presente_marcacao);
             item_sala = itemView.findViewById(R.id.sala_item_id);
         }
     }

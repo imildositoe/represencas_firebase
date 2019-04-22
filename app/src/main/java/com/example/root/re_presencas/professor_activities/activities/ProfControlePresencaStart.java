@@ -37,10 +37,14 @@ public class ProfControlePresencaStart extends AppCompatActivity {
 
     private DatabaseReference raiz;
     private List<Sala> salaList;
-    /*private RecyclerView recyclerViewSala;*/
     private Spinner spinnerTurmas;
     private ListView listViewSala;
     public static final String ID_SALA = "id";
+    public static final String ID_DISCIPLINA = "id_disciplina";
+    public static final String SELECTED_ITEM = "selected_item";
+    public static final String ID_ALOCACAO = "id_alocacao";
+    public static String idDisciplina;
+    public static String idAlocacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,6 @@ public class ProfControlePresencaStart extends AppCompatActivity {
 
         raiz = FirebaseDatabase.getInstance().getReference();
         salaList = new LinkedList<>();
-        /*recyclerViewSala = findViewById(R.id.recycler_view_sala);*/
         spinnerTurmas = findViewById(R.id.spinner_turmas);
         listViewSala = findViewById(R.id.recycler_view_sala);
 
@@ -64,7 +67,9 @@ public class ProfControlePresencaStart extends AppCompatActivity {
                 Sala sala = salaList.get(position);
                 Intent intent = new Intent(ProfControlePresencaStart.this, ProfControleEstatisticasPresenca.class);
                 intent.putExtra(ID_SALA, sala.getId());
-//                intent.putExtra();
+                intent.putExtra(SELECTED_ITEM, spinnerTurmas.getSelectedItem().toString());
+                intent.putExtra(ID_DISCIPLINA, idDisciplina);
+                intent.putExtra(ID_ALOCACAO, idAlocacao);
                 startActivity(intent);
             }
         });
@@ -87,7 +92,6 @@ public class ProfControlePresencaStart extends AppCompatActivity {
                     Sala sala = d.getValue(Sala.class);
                     salaList.add(sala);
                 }
-                /*RecyclerSalas adapter = new RecyclerSalas(ProfControlePresencaStart.this, salaList);*/
                 ListViewSalas adapter = new ListViewSalas(ProfControlePresencaStart.this, salaList);
                 listViewSala.setAdapter(adapter);
             }
@@ -131,8 +135,12 @@ public class ProfControlePresencaStart extends AppCompatActivity {
                             for (DataSnapshot d : dataSnapshot.getChildren()) {
                                 Disciplina disciplina = d.getValue(Disciplina.class);
                                 assert disciplina != null;
-                                String turma = disciplina.getDesignacao() + " " + a.getAno() + " - " + a.getPeriodo();
+                                char idDisc = disciplina.getId().charAt(disciplina.getId().length() - 1);
+                                String turma = disciplina.getDesignacao() + "  " + a.getAno() + "  " + a.getPeriodo() + idDisc;
                                 helper.add(turma);
+
+                                idDisciplina = disciplina.getId();
+                                idAlocacao = a.getId();
 
                                 String[] arraySpinner = new String[helper.size()];
                                 for (int i = 0; i < helper.size(); i++) {

@@ -27,7 +27,7 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView6"
+                app:layout_constraintStart_toEndOf="@+id/tv_faltas_cometidas_est"
                 app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
             <android.support.constraint.Guideline
@@ -75,11 +75,11 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/guideline6"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView8"
+                app:layout_constraintStart_toEndOf="@+id/tv_faltas_remanescentes_est"
                 app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/tv_aulas_total_est"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
@@ -93,7 +93,7 @@
                 app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/tv_faltas_cometidas_est"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -104,38 +104,38 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView4" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_aulas_total_est" />
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/btn2"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="BD I\nLab"
+                android:text="-"
                 android:textAllCaps="false"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline3"
-                app:layout_constraintEnd_toStartOf="@+id/button4"
+                app:layout_constraintEnd_toStartOf="@+id/btn3"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/button"
+                app:layout_constraintStart_toEndOf="@+id/btn1"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/btn3"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="LPC\nPL"
+                android:text="-"
                 android:textAllCaps="false"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline3"
-                app:layout_constraintEnd_toStartOf="@+id/button5"
+                app:layout_constraintEnd_toStartOf="@+id/btn4"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/button3"
+                app:layout_constraintStart_toEndOf="@+id/btn2"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <android.support.constraint.Guideline
@@ -164,23 +164,23 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView4"
+                app:layout_constraintStart_toEndOf="@+id/tv_aulas_total_est"
                 app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
             <Button
-                android:id="@+id/button6"
+                android:id="@+id/btn5"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="FG\nPL"
+                android:text="-"
                 android:textAllCaps="false"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline3"
-                app:layout_constraintEnd_toStartOf="@+id/button7"
+                app:layout_constraintEnd_toStartOf="@+id/btn6"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/button5"
+                app:layout_constraintStart_toEndOf="@+id/btn4"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -191,12 +191,12 @@
                 android:text="Participante"
                 android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
                 app:layout_constraintBottom_toTopOf="@+id/guideline4"
-                app:layout_constraintEnd_toEndOf="@+id/textView2"
-                app:layout_constraintStart_toStartOf="@+id/textView2"
-                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+                app:layout_constraintEnd_toEndOf="@+id/tv_nome_part_est"
+                app:layout_constraintStart_toStartOf="@+id/tv_nome_part_est"
+                app:layout_constraintTop_toBottomOf="@+id/tv_nome_part_est" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/tv_nome_part_est"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -207,39 +207,39 @@
                 app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
             <Button
-                android:id="@+id/button5"
+                android:id="@+id/btn4"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="ES\nPL"
+                android:text="-"
                 android:textAllCaps="false"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline3"
-                app:layout_constraintEnd_toStartOf="@+id/button6"
+                app:layout_constraintEnd_toStartOf="@+id/btn5"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/button4"
+                app:layout_constraintStart_toEndOf="@+id/btn3"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/btn1"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="AM II \n PL"
+                android:text="-"
                 android:textAllCaps="false"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline3"
-                app:layout_constraintEnd_toStartOf="@+id/button3"
+                app:layout_constraintEnd_toStartOf="@+id/btn2"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/tv_faltas_remanescentes_est"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -252,22 +252,22 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/guideline6"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView6" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_faltas_cometidas_est" />
 
             <Button
-                android:id="@+id/button7"
+                android:id="@+id/btn6"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="EDA\nPL"
+                android:text="-"
                 android:textAllCaps="false"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/button6"
+                app:layout_constraintStart_toEndOf="@+id/btn5"
                 app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.motion.MotionLayout>
 

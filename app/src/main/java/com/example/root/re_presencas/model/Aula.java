@@ -1,26 +1,22 @@
 package com.example.root.re_presencas.model;
 
+import android.support.annotation.NonNull;
+
 public class Aula {
 
     private String id;
-    private String idSala;
-    private String idAlocacao;
-    private String idInscricao;
+    private String id_sala;
+    private String id_alocacao;
+    private String data;
 
     public Aula() {
     }
 
-    public Aula(String id, String idSala, String idAlocacao, String idInscricao) {
+    public Aula(String id, String id_sala, String id_alocacao, String data) {
         this.id = id;
-        this.idSala = idSala;
-        this.idAlocacao = idAlocacao;
-        this.idInscricao = idInscricao;
-    }
-
-    public Aula(String idSala, String idAlocacao, String idInscricao) {
-        this.idSala = idSala;
-        this.idAlocacao = idAlocacao;
-        this.idInscricao = idInscricao;
+        this.id_sala = id_sala;
+        this.id_alocacao = id_alocacao;
+        this.data = data;
     }
 
     public String getId() {
@@ -31,27 +27,38 @@ public class Aula {
         this.id = id;
     }
 
-    public String getIdSala() {
-        return idSala;
+    public String getId_sala() {
+        return id_sala;
     }
 
-    public void setIdSala(String idSala) {
-        this.idSala = idSala;
+    public void setId_sala(String id_sala) {
+        this.id_sala = id_sala;
     }
 
-    public String getIdAlocacao() {
-        return idAlocacao;
+    public String getId_alocacao() {
+        return id_alocacao;
     }
 
-    public void setIdAlocacao(String idAlocacao) {
-        this.idAlocacao = idAlocacao;
+    public void setId_alocacao(String id_alocacao) {
+        this.id_alocacao = id_alocacao;
     }
 
-    public String getIdInscricao() {
-        return idInscricao;
+    public String getData() {
+        return data;
     }
 
-    public void setIdInscricao(String idInscricao) {
-        this.idInscricao = idInscricao;
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Aula{" +
+                "id='" + id + '\'' +
+                ", id_sala='" + id_sala + '\'' +
+                ", id_alocacao='" + id_alocacao + '\'' +
+                ", data='" + data + '\'' +
+                '}';
     }
 }

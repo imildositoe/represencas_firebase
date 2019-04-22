@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/textView15"
+        android:id="@+id/tv_disciplina"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -19,24 +19,25 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView16"
+        android:id="@+id/tv_periodo_ano"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:text="Laboral 2018"
         android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
-        app:layout_constraintEnd_toEndOf="@+id/textView15"
-        app:layout_constraintStart_toStartOf="@+id/textView15"
-        app:layout_constraintTop_toBottomOf="@+id/textView15" />
+        app:layout_constraintEnd_toEndOf="@+id/tv_disciplina"
+        app:layout_constraintStart_toStartOf="@+id/tv_disciplina"
+        app:layout_constraintTop_toBottomOf="@+id/tv_disciplina" />
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
+        android:id="@+id/recycler_estudantes"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="32dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView16" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_periodo_ano" />
 </android.support.constraint.ConstraintLayout>
