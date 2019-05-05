@@ -106,15 +106,15 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 ImageView imgPhotoEst = view.findViewById(R.id.img_photo_est_marcacao);
-                TextView tvNomeEst = view.findViewById(R.id.tv_nome_estudante_marcacao);
-                TextView tvIsParticipante = view.findViewById(R.id.tv_is_presente_marcacao);
+                TextView tvNomeEst = view.findViewById(R.id.tv_nome_estudante);
+                TextView tvIsParticipante = view.findViewById(R.id.tv_is_participante);
                 TextView tvNrFaltas = view.findViewById(R.id.tv_nr_faltas);
                 TextView tvPercentagemFaltas = view.findViewById(R.id.tv_percentagem_faltas);
 
                 Intent intent = new Intent(getContext(), ProfEstPresencaSelecionado.class);
                 intent.putExtra(NOME_ESTUDANTE, tvNomeEst.getText());
                 intent.putExtra(IS_PARTICIPANTE, tvIsParticipante.getText());
-                intent.putExtra(NR_FALTAS, tvNrFaltas.getText());
+                intent.putExtra(NR_FALTAS, tvNrFaltas.getText().subSequence(0, 2).toString().trim());
                 intent.putExtra(PERCENTAGEM, tvPercentagemFaltas.getText());
                 startActivity(intent);
             }

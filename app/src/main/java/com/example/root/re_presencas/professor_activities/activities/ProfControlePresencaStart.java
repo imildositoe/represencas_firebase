@@ -43,6 +43,7 @@ public class ProfControlePresencaStart extends AppCompatActivity {
     public static final String ID_DISCIPLINA = "id_disciplina";
     public static final String SELECTED_ITEM = "selected_item";
     public static final String ID_ALOCACAO = "id_alocacao";
+    public static final String PR_LOGADO = "professor_logado";
     public static String idDisciplina;
     public static String idAlocacao;
 
@@ -65,11 +66,16 @@ public class ProfControlePresencaStart extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Sala sala = salaList.get(position);
+
+                Intent i = getIntent();
+                String[] extras = i.getStringArrayExtra(LoginActivity.PR_LOGADO);
+
                 Intent intent = new Intent(ProfControlePresencaStart.this, ProfControleEstatisticasPresenca.class);
                 intent.putExtra(ID_SALA, sala.getId());
                 intent.putExtra(SELECTED_ITEM, spinnerTurmas.getSelectedItem().toString());
                 intent.putExtra(ID_DISCIPLINA, idDisciplina);
                 intent.putExtra(ID_ALOCACAO, idAlocacao);
+                intent.putExtra(PR_LOGADO, extras);
                 startActivity(intent);
             }
         });

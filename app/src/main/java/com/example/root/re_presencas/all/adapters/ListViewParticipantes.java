@@ -32,7 +32,6 @@ public class ListViewParticipantes extends ArrayAdapter<Inscricao> {
     private List<Inscricao> mData;
     private DatabaseReference raiz;
     private Intent intent;
-    private static TextView tvNomeEst;
 
     public ListViewParticipantes(Activity context, List<Inscricao> mData) {
         super(context, R.layout.row_sala, mData);
@@ -51,42 +50,24 @@ public class ListViewParticipantes extends ArrayAdapter<Inscricao> {
         raiz = FirebaseDatabase.getInstance().getReference();
         intent = context.getIntent();
         ImageView imgPhotoEst = view.findViewById(R.id.img_photo_est);
-        tvNomeEst = view.findViewById(R.id.tv_nome_estudante);
+        final TextView tvNomeEst = view.findViewById(R.id.tv_nome_estudante);
         TextView tvIsParticipante = view.findViewById(R.id.tv_is_participante);
         TextView tvNrFaltas = view.findViewById(R.id.tv_nr_faltas);
         TextView tvPercentagemFaltas = view.findViewById(R.id.tv_percentagem_faltas);
 
-        String turma = intent.getStringExtra(ProfControlePresencaStart.SELECTED_ITEM);
-        String turmaSemId = turma.substring(0, turma.length() - 2);
-        String idDisciplinaPeriodo = turma.charAt(turma.length() - 1) + "_" + turmaSemId.split("  ")[2];
+        final Inscricao inscricao = mData.get(position);
 
-
-        Query query = raiz.child("inscricao").orderByChild("id_disciplina_periodo").equalTo(idDisciplinaPeriodo);
-        query.addValueEventListener(new ValueEventListener() {
+        Query queryEstudantes = raiz.child("estudante");
+        queryEstudantes.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot d : dataSnapshot.getChildren()) {
-                    final Inscricao inscricao = d.getValue(Inscricao.class);
-                    assert inscricao != null;
-
-                    Query queryEstudantes = raiz.child("estudante");
-                    queryEstudantes.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                Estudante estudante = d.getValue(Estudante.class);
-                                assert estudante != null;
-                                if (estudante.getId().equals(inscricao.getId_estudante())) {
-                                    tvNomeEst.setText(estudante.getNome());
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.e("Error", databaseError.getMessage());
-                        }
-                    });
+                    Estudante estudante = d.getValue(Estudante.class);
+                    assert estudante != null;
+                    if (estudante.getId().equals(inscricao.getId_estudante())) {
+                        Log.e("Participantes", estudante.getNome());
+                        tvNomeEst.setText(estudante.getNome());
+                    }
                 }
             }
 

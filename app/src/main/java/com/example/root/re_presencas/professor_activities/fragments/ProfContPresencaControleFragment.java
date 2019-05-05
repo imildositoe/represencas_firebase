@@ -19,7 +19,10 @@ import android.widget.Switch;
 
 import com.example.root.re_presencas.R;
 import com.example.root.re_presencas.all.adapters.ListViewMarcacao;
+import com.example.root.re_presencas.login.LoginActivity;
+import com.example.root.re_presencas.model.Alocacao;
 import com.example.root.re_presencas.model.Aula;
+import com.example.root.re_presencas.model.Docente;
 import com.example.root.re_presencas.model.Marcacao;
 import com.example.root.re_presencas.professor_activities.activities.ProfControlePresencaStart;
 import com.google.firebase.database.DataSnapshot;
@@ -74,31 +77,48 @@ public class ProfContPresencaControleFragment extends Fragment {
         this.controleMarcacao();
     }
 
-
     private void controleMarcacao() {
-        //Completar para que seja uma query das marcacoes daquela turma naquele dia e que seja daquela alocacao
-        Query query = raiz.child("aula");
+        String[] extras = intent.getStringArrayExtra(ProfControlePresencaStart.PR_LOGADO);
+        final Docente docenteLogado = new Docente(extras[0], extras[1], extras[2], extras[3]);
+
+        Query query = raiz.child("alocacao").orderByChild("id_docente").equalTo(docenteLogado.getId());
         query.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                marcacaoList.clear();
                 for (DataSnapshot d : dataSnapshot.getChildren()) {
-                    final Aula aula = d.getValue(Aula.class);
-                    assert aula != null;
-                    Query query1 = raiz.child("marcacao").orderByChild("id_aula").equalTo(aula.getId());
+                    final Alocacao alocacao = d.getValue(Alocacao.class);
+                    assert alocacao != null;
+
+                    Query query1 = raiz.child("aula").orderByChild("id_alocacao").equalTo(alocacao.getId());
                     query1.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             marcacaoList.clear();
                             for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                final Marcacao marcacao = d.getValue(Marcacao.class);
-                                assert marcacao != null;
+                                final Aula aula = d.getValue(Aula.class);
+                                assert aula != null;
 
-                                marcacaoList.add(marcacao);
+                                Query query2 = raiz.child("marcacao").orderByChild("id_aula").equalTo(aula.getId());
+                                query2.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        marcacaoList.clear();
+                                        for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                            final Marcacao marcacao = d.getValue(Marcacao.class);
+                                            assert marcacao != null;
+
+                                            marcacaoList.add(marcacao);
+                                        }
+                                        ListViewMarcacao adapter = new ListViewMarcacao(getActivity(), marcacaoList);
+                                        listViewControleProf.setAdapter(adapter);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
-                            ListViewMarcacao adapter = new ListViewMarcacao(getActivity(), marcacaoList);
-                            listViewControleProf.setAdapter(adapter);
                         }
 
                         @Override
@@ -107,9 +127,6 @@ public class ProfContPresencaControleFragment extends Fragment {
                         }
                     });
                 }
-
-                //swActivarMarcacao.setChecked(false);
-                //swActivarMarcacao.setText("Selar Marcação"); //tem problemas este
             }
 
             @Override
@@ -143,7 +160,7 @@ public class ProfContPresencaControleFragment extends Fragment {
                             swActivarMarcacao.setChecked(true);
                             swActivarMarcacao.setText("Selar Marcação");
 
-                            //Salvar na tabela aula
+                            //Salvar aula na tabela aula
                             String id = raiz.push().getKey();
                             String idSala = intent.getStringExtra(ProfControlePresencaStart.ID_SALA);
                             String idAlocacao = intent.getStringExtra(ProfControlePresencaStart.ID_ALOCACAO);
@@ -154,7 +171,6 @@ public class ProfContPresencaControleFragment extends Fragment {
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-
                 }
 
                 if (buttonView.isChecked() && buttonView.getText().equals("Selar Marcação".trim())) {

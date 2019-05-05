@@ -77,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.dismiss();
     }
 

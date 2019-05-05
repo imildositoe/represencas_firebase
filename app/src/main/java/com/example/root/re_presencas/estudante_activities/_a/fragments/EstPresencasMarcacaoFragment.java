@@ -17,6 +17,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -117,21 +119,22 @@ public class EstPresencasMarcacaoFragment extends Fragment {
 
     private void sessionOpened() {
         final LinkedList<Aula> aulasDeHoje = new LinkedList<>();
-        Query query = raiz.child("aula");
+        Query query = raiz.child("alocacao");
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot d : dataSnapshot.getChildren()) {
-                    final Aula aula = d.getValue(Aula.class);
-                    assert aula != null;
-                    Query query1 = raiz.child("alocacao").orderByChild("id").equalTo(aula.getId_alocacao());
+                    final Alocacao alocacao = d.getValue(Alocacao.class);
+                    assert alocacao != null;
+
+                    Query query1 = raiz.child("aula").orderByChild("id_alocacao").equalTo(alocacao.getId());
                     query1.addValueEventListener(new ValueEventListener() {
                         @TargetApi(Build.VERSION_CODES.KITKAT)
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                Alocacao alocacao = d.getValue(Alocacao.class);
-                                assert alocacao != null;
+                                final Aula aula = d.getValue(Aula.class);
+                                assert aula != null;
 
                                 int diaAula = Integer.parseInt(aula.getData().split("-")[0]);
                                 int mesAula = Integer.parseInt(aula.getData().split("-")[1]);
@@ -142,31 +145,68 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                                 int mesActual = c.get(GregorianCalendar.MONTH) + 1;
                                 int anoActual = c.get(GregorianCalendar.YEAR);
 
+                                //Adicionar intervalo de hora na verificacao para incluir dupla marcacao(duas aulas) num dia
                                 if (diaAula == diaActual && mesAula == mesActual && anoAula == anoActual) {
                                     aulasDeHoje.add(aula);
 
                                     idAula = aula.getId();
 
-                                    NotificationGenerator.openActivityNotification(
-                                            Objects.requireNonNull(getActivity()).getApplicationContext(),
-                                            "Sessão de marcação de presenças aberta",
-                                            "Começar"
-                                    );
-
-                                    new EstPresenca().disableTab(0, true, 0, true);
-
-                                    String nomeEstudante = intent.getStringArrayExtra(EstudanteMenu.EST_LOGADO)[1];
-                                    tvNome.setText(nomeEstudante);
-                                    tvPeriodo.setText(alocacao.getPeriodo());
-
-                                    Query query2 = raiz.child("disciplina").orderByChild("id").equalTo(alocacao.getId_disciplina());
+                                    //Para verificar estudantes daquela turma
+                                    Query query2 = raiz.child("inscricao");
                                     query2.addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                                             for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                                Disciplina disciplina = d.getValue(Disciplina.class);
-                                                assert disciplina != null;
-                                                tvCadeira.setText(disciplina.getDesignacao());
+                                                Inscricao inscricao = d.getValue(Inscricao.class);
+                                                assert inscricao != null;
+
+                                                Log.e("Inscr vs Aloc", inscricao.toString() + "\n" + alocacao.toString());
+                                                Log.e("--------", "----------------------------------------");
+
+
+                                                if (inscricao.getId_disciplina().equals(alocacao.getId_disciplina())
+                                                        && inscricao.getPeriodo().equals(alocacao.getPeriodo())
+                                                        && inscricao.getAno() == Calendar.getInstance().get(Calendar.YEAR)) {
+                                                    //Ja estamos perante estudantes de uma unica turma
+
+                                                    String idEstudante = intent.getStringArrayExtra(EstudanteMenu.EST_LOGADO)[0];
+
+                                                    //Verificacao para abrir a sessao para o estudante logado  android:exported="true"
+                                                    if (idEstudante.equals(inscricao.getId_estudante())) {
+
+                                                        NotificationGenerator.openActivityNotification(
+                                                                Objects.requireNonNull(getActivity()).getApplicationContext(),
+                                                                "Sessão de marcação de presenças aberta",
+                                                                "Começar"
+                                                        );
+
+                                                        EstPresenca.disableTab(0, true, 0, true);
+
+                                                        String nomeEstudante = intent.getStringArrayExtra(EstudanteMenu.EST_LOGADO)[1];
+                                                        tvNome.setText(nomeEstudante);
+                                                        tvPeriodo.setText(alocacao.getPeriodo());
+
+                                                        //Para setar o nome da disciplina em cada estudante da turma
+                                                        Query query3 = raiz.child("disciplina")
+                                                                .orderByChild("id").equalTo(alocacao.getId_disciplina());
+                                                        query3.addValueEventListener(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                                                    Disciplina disciplina = d.getValue(Disciplina.class);
+                                                                    assert disciplina != null;
+                                                                    tvCadeira.setText(disciplina.getDesignacao());
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+                                                    }
+                                                }
                                             }
                                         }
 

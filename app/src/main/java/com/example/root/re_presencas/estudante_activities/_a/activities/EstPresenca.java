@@ -14,8 +14,8 @@ import com.example.root.re_presencas.estudante_activities._a.fragments.EstPresen
 
 public class EstPresenca extends AppCompatActivity {
 
-    public TabLayout tabLayout;
-    private ViewPagerSwipe viewPager;
+    public static TabLayout tabLayout;
+    private static ViewPagerSwipe viewPager;
     private MyPagerAdapter pagerAdapter;
 
 
@@ -38,14 +38,14 @@ public class EstPresenca extends AppCompatActivity {
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        this.disableTab(0, false, 1, false);
+        disableTab(0, false, 1, false);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.setElevation(0);
     }
 
-    public void disableTab(int tabPosition, boolean isEnabled, int currentTab, boolean isSwippable) {
+    public static void disableTab(int tabPosition, boolean isEnabled, int currentTab, boolean isSwippable) {
         ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
         ViewGroup vgTab = (ViewGroup) vg.getChildAt(tabPosition);
         vgTab.setEnabled(isEnabled);
