@@ -14,6 +14,9 @@ import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 
@@ -26,8 +29,8 @@ public class ProfEstPresencaSelecionado extends AppCompatActivity {
     private ImageView imgFotoParticipante;
     private TextView tvNomePart, tvIsPart, tvAulasTotalPart, tvFaltasCometidasPart, tvFaltasRemanescentesPart;
     private Intent intent;
-    PieChart pieChart;
-    //private int[] cores = new int[]{Color.rgb(215, 27, 96), Color.rgb(0, 191, 255)};
+    private PieChart pieChart;
+    private DatabaseReference raiz;
     private int[] cores = new int[]{
             Color.rgb(255, 65, 151),
             Color.rgb(2, 187, 169)
@@ -38,37 +41,49 @@ public class ProfEstPresencaSelecionado extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prof_est_presenca_selecionado);
 
-//        imgFotoParticipante = findViewById(R.id.img_foto_participante);
+        raiz = FirebaseDatabase.getInstance().getReference();
+        //imgFotoParticipante = findViewById(R.id.img_foto_participante);
         tvNomePart = findViewById(R.id.tv_nome_participante);
         tvIsPart = findViewById(R.id.tv_is_presente_marcacao);
         tvAulasTotalPart = findViewById(R.id.tv_aulas_total_part);
         tvFaltasCometidasPart = findViewById(R.id.tv_faltas_cometidas_part);
         tvFaltasRemanescentesPart = findViewById(R.id.tv_faltas_remanescentes_part);
         intent = getIntent();
-
-        this.setTexts();
-        this.grafico();
     }
 
-    private void setTexts() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        this.setTextsAndChart();
+    }
+
+    private void setTextsAndChart() {
+
         String nome = intent.getStringExtra(ProfEstPresencaParticipantesFragment.NOME_ESTUDANTE);
-        String isParticipantes = intent.getStringExtra(ProfEstPresencaParticipantesFragment.IS_PARTICIPANTE);
+        String isParticipante = intent.getStringExtra(ProfEstPresencaParticipantesFragment.IS_PARTICIPANTE);
         String nrFaltas = intent.getStringExtra(ProfEstPresencaParticipantesFragment.NR_FALTAS);
-        String percentagem = intent.getStringExtra(ProfEstPresencaParticipantesFragment.PERCENTAGEM);
+        String percent = intent.getStringExtra(ProfEstPresencaParticipantesFragment.PERCENTAGEM);
+        int faltas = Integer.parseInt(nrFaltas);
+        int percentagem = Integer.parseInt(percent);
+        //int aulas = (faltas * 100) / percentagem; //Tratar a divisao por zero, para estudantes sem faltas(percentagem=0)
+        int aulas = Integer.parseInt(intent.getStringExtra(ProfEstPresencaParticipantesFragment.AULAS_TOTAL));
+        String faltasRemanText = Integer.toString(aulas - faltas);
+        String aulasTotalText = Integer.toString(aulas);
 
         tvNomePart.setText(nome);
-        tvIsPart.setText(isParticipantes);
-        /*tvAulasTotalPart.setText();*/
+        tvIsPart.setText(isParticipante);
+        tvAulasTotalPart.setText(aulasTotalText);
         tvFaltasCometidasPart.setText(nrFaltas);
-        /*tvFaltasRemanescentesPart.setText();*/
-    }
+        tvFaltasRemanescentesPart.setText(faltasRemanText);
 
-    private void grafico() {
+
+        //Grafico
         pieChart = findViewById(R.id.prof_pie_presencas_selec_estat);
 
         ArrayList<PieEntry> yValues = new ArrayList<>();
-        yValues.add(new PieEntry(20, "Faltas Cometidas"));
-        yValues.add(new PieEntry(50 - 20, "Faltas Remanescentes"));
+        int faltasPerc = (faltas * 100) / aulas;
+        yValues.add(new PieEntry(faltasPerc, "Faltas Cometidas"));
+        yValues.add(new PieEntry(100 - faltasPerc, "Faltas Remanescentes"));
 
         PieDataSet dataSet = new PieDataSet(yValues, "");
         dataSet.setLabel("");
@@ -80,7 +95,7 @@ public class ProfEstPresencaSelecionado extends AppCompatActivity {
         description.setText("");
         pieChart.setDescription(description);
         pieChart.setDrawEntryLabels(false);
-        pieChart.setUsePercentValues(true);
+        //pieChart.setUsePercentValues(true);
         pieChart.setCenterText("Faltas (%)");
         pieChart.setCenterTextSize(8);
         pieChart.animateXY(1400, 1400);

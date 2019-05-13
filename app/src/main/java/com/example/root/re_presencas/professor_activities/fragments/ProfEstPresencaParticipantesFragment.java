@@ -46,6 +46,7 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
     public static final String IS_PARTICIPANTE = "is_participante";
     public static final String NR_FALTAS = "nr_faltas";
     public static final String PERCENTAGEM = "percentagem";
+    public static final String AULAS_TOTAL = "aulas_total";
 
     public ProfEstPresencaParticipantesFragment() {
     }
@@ -110,12 +111,14 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
                 TextView tvIsParticipante = view.findViewById(R.id.tv_is_participante);
                 TextView tvNrFaltas = view.findViewById(R.id.tv_nr_faltas);
                 TextView tvPercentagemFaltas = view.findViewById(R.id.tv_percentagem_faltas);
+                int aulas = ListViewParticipantes.aulasTotal;
 
                 Intent intent = new Intent(getContext(), ProfEstPresencaSelecionado.class);
                 intent.putExtra(NOME_ESTUDANTE, tvNomeEst.getText());
                 intent.putExtra(IS_PARTICIPANTE, tvIsParticipante.getText());
                 intent.putExtra(NR_FALTAS, tvNrFaltas.getText().subSequence(0, 2).toString().trim());
-                intent.putExtra(PERCENTAGEM, tvPercentagemFaltas.getText());
+                intent.putExtra(PERCENTAGEM, tvPercentagemFaltas.getText().subSequence(0, 2).toString().trim());
+                intent.putExtra(AULAS_TOTAL, Integer.toString(aulas));
                 startActivity(intent);
             }
         });

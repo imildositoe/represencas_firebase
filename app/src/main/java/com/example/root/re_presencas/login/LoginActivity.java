@@ -169,9 +169,8 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra(PR_LOGADO, extras);
                                 startActivity(intent);
                             } else {
-                                Toast.makeText(LoginActivity.this, "Username ou senha incorrectos!", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
                             }
-
                         }
 
                         @Override
@@ -203,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra(EST_LOGADO, extras);
                                 startActivity(intent);
                             } else {
-                                Toast.makeText(LoginActivity.this, "Username ou senha incorrectos!", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
                             }
                         }
 

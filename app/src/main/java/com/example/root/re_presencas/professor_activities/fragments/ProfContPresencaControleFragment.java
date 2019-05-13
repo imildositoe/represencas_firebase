@@ -45,9 +45,11 @@ public class ProfContPresencaControleFragment extends Fragment {
 
     private DatabaseReference raiz;
     private Switch swActivarMarcacao;
+    private Switch swSelarMarcacao;
     private ListView listViewControleProf;
     private Intent intent;
     private List<Marcacao> marcacaoList;
+    private static String idAula;
 
     public ProfContPresencaControleFragment() {
 
@@ -61,10 +63,12 @@ public class ProfContPresencaControleFragment extends Fragment {
 
         raiz = FirebaseDatabase.getInstance().getReference();
         swActivarMarcacao = view.findViewById(R.id.sw_activar_marcacao);
+        swSelarMarcacao = view.findViewById(R.id.sw_selar_marcacao);
         listViewControleProf = view.findViewById(R.id.recycler_controle_prof);
         intent = Objects.requireNonNull(getActivity()).getIntent();
         marcacaoList = new LinkedList<>();
 
+        swSelarMarcacao.setVisibility(View.INVISIBLE);
         this.switchClicked();
 
         return view;
@@ -142,7 +146,7 @@ public class ProfContPresencaControleFragment extends Fragment {
             @TargetApi(Build.VERSION_CODES.KITKAT)
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.isChecked() && buttonView.getText().equals("Activar Marcação".trim())) {
+                if (buttonView.isChecked()) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
                     builder.setTitle("Aviso");
                     builder.setMessage("Deseja mesmo activar sessão para que estudantes dessa sala marquem presenças?");
@@ -158,13 +162,14 @@ public class ProfContPresencaControleFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             swActivarMarcacao.setChecked(true);
-                            swActivarMarcacao.setText("Selar Marcação");
+                            swSelarMarcacao.setVisibility(View.VISIBLE);
 
                             //Salvar aula na tabela aula
                             String id = raiz.push().getKey();
+                            idAula = id;
                             String idSala = intent.getStringExtra(ProfControlePresencaStart.ID_SALA);
                             String idAlocacao = intent.getStringExtra(ProfControlePresencaStart.ID_ALOCACAO);
-                            Aula aula = new Aula(id, idSala, idAlocacao, getDataActual());
+                            Aula aula = new Aula(id, idSala, idAlocacao, getDataActual(), false);
                             assert id != null;
                             raiz.child("aula").child(id).setValue(aula);
                         }
@@ -172,15 +177,22 @@ public class ProfContPresencaControleFragment extends Fragment {
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 }
+            }
+        });
 
-                if (buttonView.isChecked() && buttonView.getText().equals("Selar Marcação".trim())) {
+
+        swSelarMarcacao.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @TargetApi(Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isChecked()) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
                     builder.setTitle("Aviso");
                     builder.setMessage("Deseja mesmo selar a sessão para confirmar a presença desses estudantes?");
                     builder.setNegativeButton("Não ", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            swActivarMarcacao.setChecked(false);
+                            swSelarMarcacao.setChecked(false);
                         }
                     });
 
@@ -188,13 +200,12 @@ public class ProfContPresencaControleFragment extends Fragment {
                         @SuppressLint("SetTextI18n")
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            swActivarMarcacao.setChecked(true);
-                            // Perform action to close session
+                            swSelarMarcacao.setChecked(true);
+                            raiz.child("aula").child(idAula).child("is_selado").setValue(true);
                         }
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-
                 }
             }
         });

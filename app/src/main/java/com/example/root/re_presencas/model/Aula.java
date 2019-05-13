@@ -8,15 +8,17 @@ public class Aula {
     private String id_sala;
     private String id_alocacao;
     private String data;
+    private boolean is_selado;
 
     public Aula() {
     }
 
-    public Aula(String id, String id_sala, String id_alocacao, String data) {
+    public Aula(String id, String id_sala, String id_alocacao, String data, boolean is_selado) {
         this.id = id;
         this.id_sala = id_sala;
         this.id_alocacao = id_alocacao;
         this.data = data;
+        this.is_selado = is_selado;
     }
 
     public String getId() {
@@ -51,6 +53,15 @@ public class Aula {
         this.data = data;
     }
 
+    public boolean isIs_selado() {
+        return is_selado;
+    }
+
+    public void setIs_selado(boolean is_selado) {
+        this.is_selado = is_selado;
+    }
+
+
     @NonNull
     @Override
     public String toString() {
@@ -59,6 +70,7 @@ public class Aula {
                 ", id_sala='" + id_sala + '\'' +
                 ", id_alocacao='" + id_alocacao + '\'' +
                 ", data='" + data + '\'' +
+                ", is_selado=" + is_selado +
                 '}';
     }
 }

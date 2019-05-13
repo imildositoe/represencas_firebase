@@ -34,7 +34,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -77,138 +79,81 @@ public class EstPresencasEstatisticasFragment extends Fragment {
         btn5 = view.findViewById(R.id.btn5);
         btn6 = view.findViewById(R.id.btn6);
 
-        this.clickButtons();
-
         return view;
     }
 
-    private void clickButtons() {
-
-    }
 
     @Override
     public void onStart() {
         super.onStart();
-        this.grafico();
+        this.fillButtons();
+
+        this.buttonsAction();
     }
 
     /**
      * [estudante + inscricao + marcacao] to produce piechart
      */
-    private void grafico() {
+    private void fillButtons() {
         tvNome.setText(intent.getStringArrayExtra(EstudanteMenu.EST_LOGADO)[1]);
 
         String idEstudante = intent.getStringArrayExtra(EstudanteMenu.EST_LOGADO)[0];
+
+        //falta delimitar p/ pegar somente inscricoes daquele semestre
         Query query = raiz.child("inscricao").orderByChild("id_estudante").equalTo(idEstudante);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final LinkedList<String> buttonHelper = new LinkedList<>();
+
                 for (DataSnapshot d : dataSnapshot.getChildren()) {
-                    Inscricao inscricao = d.getValue(Inscricao.class);
+                    final Inscricao inscricao = d.getValue(Inscricao.class);
                     assert inscricao != null;
 
-                    Query queryDisc = raiz.child("disciplina").orderByChild("id").equalTo(inscricao.getId_disciplina());
-                    final LinkedList<String> buttonHelper = new LinkedList<>();
-                    queryDisc.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                Disciplina disciplina = d.getValue(Disciplina.class);
-                                assert disciplina != null;
+                    //Verificacao p/ que sejam inscicoes daquele ano somente [falta semestre]
+                    if (inscricao.getAno() == Calendar.getInstance().get(Calendar.YEAR)) {
 
-                                // Preencher as disciplinas nos botoes(sao disciplinas em que o estudante logado foi inscrito)
-                                buttonHelper.add(disciplina.getDesignacao());
-                            }
+                        //Join com disciplina para apanhar o nome da disciplina
+                        Query queryDisc = raiz.child("disciplina").orderByChild("id").equalTo(inscricao.getId_disciplina());
+                        queryDisc.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                    Disciplina disciplina = d.getValue(Disciplina.class);
+                                    assert disciplina != null;
 
-                            try {
-                                btn1.setText(buttonHelper.get(0));
-                                btn2.setText(buttonHelper.get(1));
-                                btn3.setText(buttonHelper.get(2));
-                                btn4.setText(buttonHelper.get(3));
-                                btn5.setText(buttonHelper.get(4));
-                                btn6.setText(buttonHelper.get(5));
-                            } catch (NullPointerException | IndexOutOfBoundsException e) {
-                                Log.e("Botoes", e.toString());
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                    Query queryMarc = raiz.child("alocacao").orderByChild("id_disciplina").equalTo(inscricao.getId_disciplina());
-                    queryMarc.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                Alocacao alocacao = d.getValue(Alocacao.class);
-                                assert alocacao != null;
-
-                                String nr_aulas = Integer.toString(alocacao.getNr_aulas());
-                                tvAulasTotal.setText(nr_aulas);
-                                aulasTotal = alocacao.getNr_aulas();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                    Query query1 = raiz.child("marcacao").orderByChild("id_inscricao").equalTo(inscricao.getId());
-                    query1.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int faltas = 0;
-                            for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                Marcacao marcacao = d.getValue(Marcacao.class);
-                                assert marcacao != null;
-
-                                //Pega-se o numero de faltas do estudante logado aqui
-                                if (!marcacao.isIs_presente()) {
-                                    faltas++;
+                                    // Preencher as disciplinas nos botoes(sao disciplinas em que o estudante logado foi inscrito)
+                                    String disText = disciplina.getDesignacao() + "  " + disciplina.getId().charAt(disciplina.getId().
+                                            length() - 1) + "  " + inscricao.getId().charAt(inscricao.getId().length() - 1);
+                                    buttonHelper.add(disText);
                                 }
+
+                                try {
+                                    btn1.setText(buttonHelper.get(0));
+                                    btn2.setText(buttonHelper.get(1));
+                                    btn3.setText(buttonHelper.get(2));
+                                    btn4.setText(buttonHelper.get(3));
+                                    btn5.setText(buttonHelper.get(4));
+                                    btn6.setText(buttonHelper.get(5));
+                                } catch (NullPointerException | IndexOutOfBoundsException e) {
+                                    Log.e("Botoes", e.toString());
+                                }
+
+                                clickButtons(btn1);
+                                btn1.setBackgroundColor(Color.rgb(215, 27, 96));
+                                btn2.setBackgroundColor(Color.rgb(187, 132, 150));
+                                btn3.setBackgroundColor(Color.rgb(187, 132, 150));
+                                btn4.setBackgroundColor(Color.rgb(187, 132, 150));
+                                btn5.setBackgroundColor(Color.rgb(187, 132, 150));
+                                btn6.setBackgroundColor(Color.rgb(187, 132, 150));
                             }
 
-                            String textFaltas = Integer.toString(faltas);
-                            String textFaltasRem = Integer.toString(aulasTotal - faltas);
-                            tvFaltasCom.setText(textFaltas);
-                            tvFaltasReman.setText(textFaltasRem);
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            //Grafico aqui
-
-                            ArrayList<PieEntry> yValues = new ArrayList<>();
-                            yValues.add(new PieEntry(faltas, "Faltas Cometidas"));
-                            yValues.add(new PieEntry(aulasTotal - faltas, "Faltas Remanescentes"));
-
-                            final PieDataSet dataSet = new PieDataSet(yValues, "");
-                            dataSet.setLabel("");
-                            dataSet.setValueTextColor(Color.WHITE);
-                            dataSet.setColors(cores);
-
-                            PieData pieData = new PieData(dataSet);
-                            pieChart.setData(pieData);
-                            Description description = new Description();
-                            description.setText("");
-                            pieChart.setDescription(description);
-                            pieChart.setDrawEntryLabels(false);
-                            pieChart.setUsePercentValues(true);
-                            pieChart.setCenterText("Faltas (%)");
-                            pieChart.setCenterTextSize(8);
-                            pieChart.animateXY(1400, 1400);
-                            pieChart.invalidate();
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
             }
 
@@ -217,5 +162,184 @@ public class EstPresencasEstatisticasFragment extends Fragment {
 
             }
         });
+    }
+
+
+    private void buttonsAction() {
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickButtons(btn1);
+                btn1.setBackgroundColor(Color.rgb(215, 27, 96));
+                btn2.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn3.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn4.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn5.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn6.setBackgroundColor(Color.rgb(187, 132, 150));
+            }
+        });
+
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickButtons(btn2);
+                btn2.setBackgroundColor(Color.rgb(215, 27, 96));
+                btn1.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn3.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn4.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn5.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn6.setBackgroundColor(Color.rgb(187, 132, 150));
+            }
+        });
+
+        btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickButtons(btn3);
+                btn3.setBackgroundColor(Color.rgb(215, 27, 96));
+                btn1.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn2.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn4.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn5.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn6.setBackgroundColor(Color.rgb(187, 132, 150));
+            }
+        });
+
+        btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickButtons(btn4);
+                btn4.setBackgroundColor(Color.rgb(215, 27, 96));
+                btn1.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn2.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn3.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn5.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn6.setBackgroundColor(Color.rgb(187, 132, 150));
+            }
+        });
+
+        btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickButtons(btn5);
+                btn5.setBackgroundColor(Color.rgb(215, 27, 96));
+                btn1.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn2.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn3.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn4.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn6.setBackgroundColor(Color.rgb(187, 132, 150));
+            }
+        });
+
+        btn6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickButtons(btn6);
+                btn6.setBackgroundColor(Color.rgb(215, 27, 96));
+                btn1.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn2.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn3.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn4.setBackgroundColor(Color.rgb(187, 132, 150));
+                btn5.setBackgroundColor(Color.rgb(187, 132, 150));
+            }
+        });
+    }
+
+    private void clickButtons(Button btn) {
+        String textButton = btn.getText().toString();
+
+        if (!textButton.trim().equals("-")) {
+            final String idDisciplina = "disciplina" + textButton.split("  ")[1];
+            final String idInscricao = "inscricao" + textButton.split("  ")[2];
+
+            Query query = raiz.child("inscricao").orderByChild("id").equalTo(idInscricao);
+            query.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        final Inscricao inscricao = d.getValue(Inscricao.class);
+                        assert inscricao != null;
+
+                        Query queryMarc = raiz.child("alocacao").orderByChild("id_disciplina").equalTo(idDisciplina);
+                        queryMarc.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                    Alocacao alocacao = d.getValue(Alocacao.class);
+                                    assert alocacao != null;
+
+                                    if (alocacao.getAno() == inscricao.getAno() && alocacao.getPeriodo().equals(inscricao.getPeriodo())) {
+                                        String nr_aulas = Integer.toString(alocacao.getNr_aulas());
+                                        tvAulasTotal.setText(nr_aulas);
+                                        aulasTotal = alocacao.getNr_aulas();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+
+                        Query query1 = raiz.child("marcacao").orderByChild("id_inscricao").equalTo(inscricao.getId());
+                        query1.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                int faltas = 0;
+                                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                    Marcacao marcacao = d.getValue(Marcacao.class);
+                                    assert marcacao != null;
+
+                                    //Pega-se o numero de faltas do estudante logado aqui
+                                    if (!marcacao.isIs_presente()) {
+                                        faltas++;
+                                    }
+                                }
+
+                                String textFaltas = Integer.toString(faltas);
+                                String textFaltasRem = Integer.toString(aulasTotal - faltas);
+                                tvFaltasCom.setText(textFaltas);
+                                tvFaltasReman.setText(textFaltasRem);
+
+                                //Grafico aqui
+                                ArrayList<PieEntry> yValues = new ArrayList<>();
+                                int faltasPerc = (faltas * 100) / aulasTotal;
+                                yValues.add(new PieEntry(faltasPerc, "Faltas Cometidas"));
+                                yValues.add(new PieEntry(100 - faltasPerc, "Faltas Remanescentes"));
+
+                                final PieDataSet dataSet = new PieDataSet(yValues, "");
+                                dataSet.setLabel("");
+                                dataSet.setValueTextColor(Color.WHITE);
+                                dataSet.setColors(cores);
+
+                                PieData pieData = new PieData(dataSet);
+                                pieChart.setData(pieData);
+                                Description description = new Description();
+                                description.setText("");
+                                pieChart.setDescription(description);
+                                pieChart.setDrawEntryLabels(false);
+                                pieChart.setUsePercentValues(true);
+                                //pieChart.setCenterText("Faltas (%)");
+                                pieChart.setCenterTextSize(8);
+                                pieChart.animateXY(1400, 1400);
+                                pieChart.invalidate();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }

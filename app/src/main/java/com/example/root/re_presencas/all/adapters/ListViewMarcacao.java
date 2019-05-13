@@ -34,7 +34,7 @@ public class ListViewMarcacao extends ArrayAdapter<Marcacao> {
     private Intent intent;
 
     public ListViewMarcacao(Activity context, List<Marcacao> mData) {
-        super(context, R.layout.row_sala, mData);
+        super(context, R.layout.row_marcacao, mData);
         this.context = context;
         this.mData = mData;
     }
@@ -42,7 +42,7 @@ public class ListViewMarcacao extends ArrayAdapter<Marcacao> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = this.context.getLayoutInflater();
         View view = inflater.inflate(R.layout.row_marcacao, null, true);
 
@@ -52,7 +52,8 @@ public class ListViewMarcacao extends ArrayAdapter<Marcacao> {
         final TextView tvIsPresente = view.findViewById(R.id.tv_is_presente_marcacao);
         final CheckBox cbIsPresente = view.findViewById(R.id.cb_is_presente);
 
-        String idInscricao = mData.get(position).getId_inscricao();
+        final String idInscricao = mData.get(position).getId_inscricao();
+        final String idMarcacao = mData.get(position).getId();
 
         //Joining tables to show the exactly name in each listview row
         Query query = raiz.child("inscricao").orderByChild("id").equalTo(idInscricao);
@@ -77,8 +78,10 @@ public class ListViewMarcacao extends ArrayAdapter<Marcacao> {
                                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                         if (buttonView.isChecked()) {
                                             tvIsPresente.setText("Presente");
+                                            raiz.child("marcacao").child(idMarcacao).child("is_presente").setValue(true);
                                         } else if (!buttonView.isChecked()) {
                                             tvIsPresente.setText("Não Presente");
+                                            raiz.child("marcacao").child(idMarcacao).child("is_presente").setValue(false);
                                         }
                                     }
                                 });

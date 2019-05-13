@@ -88,6 +88,7 @@ public class EstPresencasMarcacaoFragment extends Fragment {
         this.imgFingerClick();
         this.sessionOpened();
         this.getIdInscicao();
+        this.sessionClosed();
 
         return view;
     }
@@ -139,6 +140,7 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                                 int diaAula = Integer.parseInt(aula.getData().split("-")[0]);
                                 int mesAula = Integer.parseInt(aula.getData().split("-")[1]);
                                 int anoAula = Integer.parseInt(aula.getData().split("-")[2]);
+                                boolean isSelado = aula.isIs_selado();
 
                                 GregorianCalendar c = (GregorianCalendar) GregorianCalendar.getInstance();
                                 int diaActual = c.get(GregorianCalendar.DAY_OF_MONTH);
@@ -146,7 +148,7 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                                 int anoActual = c.get(GregorianCalendar.YEAR);
 
                                 //Adicionar intervalo de hora na verificacao para incluir dupla marcacao(duas aulas) num dia
-                                if (diaAula == diaActual && mesAula == mesActual && anoAula == anoActual) {
+                                if (diaAula == diaActual && mesAula == mesActual && anoAula == anoActual && !isSelado) {
                                     aulasDeHoje.add(aula);
 
                                     idAula = aula.getId();
@@ -156,14 +158,9 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                                     query2.addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                                             for (DataSnapshot d : dataSnapshot.getChildren()) {
                                                 Inscricao inscricao = d.getValue(Inscricao.class);
                                                 assert inscricao != null;
-
-                                                Log.e("Inscr vs Aloc", inscricao.toString() + "\n" + alocacao.toString());
-                                                Log.e("--------", "----------------------------------------");
-
 
                                                 if (inscricao.getId_disciplina().equals(alocacao.getId_disciplina())
                                                         && inscricao.getPeriodo().equals(alocacao.getPeriodo())
@@ -215,6 +212,39 @@ public class EstPresencasMarcacaoFragment extends Fragment {
 
                                         }
                                     });
+
+                                } else if (diaAula == diaActual && mesAula == mesActual && anoAula == anoActual && isSelado) {
+                                    //Para verificar estudantes daquela turma
+                                    Query query2 = raiz.child("inscricao");
+                                    query2.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                            for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                                Inscricao inscricao = d.getValue(Inscricao.class);
+                                                assert inscricao != null;
+
+                                                if (inscricao.getId_disciplina().equals(alocacao.getId_disciplina())
+                                                        && inscricao.getPeriodo().equals(alocacao.getPeriodo())
+                                                        && inscricao.getAno() == Calendar.getInstance().get(Calendar.YEAR)) {
+                                                    //Ja estamos perante estudantes de uma unica turma
+
+                                                    String idEstudante = intent.getStringArrayExtra(EstudanteMenu.EST_LOGADO)[0];
+
+                                                    //Verificacao para fechar a sessao para o estudante logado
+                                                    if (idEstudante.equals(inscricao.getId_estudante())) {
+
+                                                        EstPresenca.disableTab(0, false, 1, false);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
                             }
                         }
@@ -232,6 +262,105 @@ public class EstPresencasMarcacaoFragment extends Fragment {
 
             }
         });
+    }
+
+
+    /**
+     * Metodo para verificar estudantes que nao marcaram as presencas e atribuir-los faltas
+     * */
+    private void sessionClosed() {
+        Query query = raiz.child("aula").orderByChild("id").equalTo(idAula);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    Aula aula = d.getValue(Aula.class);
+                    assert aula != null;
+
+                    final LinkedList<String> idInscricoes = new LinkedList<>();
+                    Query query1 = raiz.child("marcacao").orderByChild("id_aula").equalTo(idAula);
+                    query1.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                Marcacao marcacao = d.getValue(Marcacao.class);
+                                assert marcacao != null;
+
+                                //adicionando id's das inscricoes que marcaram as presencas na sala
+                                if (marcacao.getData().equals(getDataActual())) {
+                                    idInscricoes.add(marcacao.getId_inscricao());
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+                    //pegando a alocacao(turma) em que o docente activou a sessao
+                    Query query2 = raiz.child("alocacao").orderByChild("id").equalTo(aula.getId_alocacao());
+                    query2.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                final Alocacao alocacao = d.getValue(Alocacao.class);
+                                assert alocacao != null;
+
+                                Query query3 = raiz.child("inscricao");
+                                query3.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                            Inscricao inscricao = d.getValue(Inscricao.class);
+                                            assert inscricao != null;
+
+                                            //inscricoes que fazem parte daquela turma
+                                            if (inscricao.getId_disciplina().equals(alocacao.getId_disciplina())
+                                                    && inscricao.getPeriodo().equals(alocacao.getPeriodo())
+                                                    && inscricao.getAno() == Calendar.getInstance().get(Calendar.YEAR)) {
+
+                                                for (String idInsc : idInscricoes) {
+                                                    //verifica as inscricoes que nao marcaram presencas para poder DAR FALTA
+                                                    if (!idInsc.equals(inscricao.getId())) {
+
+                                                        String idMarcacao = raiz.push().getKey();
+                                                        Marcacao marcacao = new Marcacao(idMarcacao, idAula, idInscricao, false, getDataActual());
+                                                        assert idMarcacao != null;
+                                                        raiz.child("marcacao").child(idMarcacao).setValue(marcacao);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private int getNrMarcacoesPorDia() {
+        return 0;
     }
 
     @SuppressLint({"SetTextI18n", "ResourceAsColor"})
