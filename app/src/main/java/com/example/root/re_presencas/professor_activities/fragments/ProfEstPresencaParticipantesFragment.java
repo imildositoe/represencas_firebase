@@ -47,6 +47,7 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
     public static final String NR_FALTAS = "nr_faltas";
     public static final String PERCENTAGEM = "percentagem";
     public static final String AULAS_TOTAL = "aulas_total";
+    public static final String ID_EST_SELECIONADO = "id_est_sel";
 
     public ProfEstPresencaParticipantesFragment() {
     }
@@ -77,8 +78,7 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
 
     private void fillListView() {
         String turma = intent.getStringExtra(ProfControlePresencaStart.SELECTED_ITEM);
-        String turmaSemId = turma.substring(0, turma.length() - 1);
-        String idDisciplinaPeriodo = turma.charAt(turma.length() - 1) + "_" + turmaSemId.split("  ")[2];
+        String idDisciplinaPeriodo = turma.split("  ")[3] + "_" + turma.split("  ")[2];
 
 
         Query query = raiz.child("inscricao").orderByChild("id_disciplina_periodo").equalTo(idDisciplinaPeriodo);
@@ -106,7 +106,7 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                ImageView imgPhotoEst = view.findViewById(R.id.img_photo_est_marcacao);
+                TextView tvIdPart = view.findViewById(R.id.tv_id_est_participante);
                 TextView tvNomeEst = view.findViewById(R.id.tv_nome_estudante);
                 TextView tvIsParticipante = view.findViewById(R.id.tv_is_participante);
                 TextView tvNrFaltas = view.findViewById(R.id.tv_nr_faltas);
@@ -119,6 +119,7 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
                 intent.putExtra(NR_FALTAS, tvNrFaltas.getText().subSequence(0, 2).toString().trim());
                 intent.putExtra(PERCENTAGEM, tvPercentagemFaltas.getText().subSequence(0, 2).toString().trim());
                 intent.putExtra(AULAS_TOTAL, Integer.toString(aulas));
+                intent.putExtra(ID_EST_SELECIONADO, tvIdPart.getText());
                 startActivity(intent);
             }
         });
@@ -126,9 +127,8 @@ public class ProfEstPresencaParticipantesFragment extends Fragment {
 
     private void setTextViews() {
         String turma = intent.getStringExtra(ProfControlePresencaStart.SELECTED_ITEM);
-        String turmaSemId = turma.substring(0, turma.length() - 1);
         String disciplina = turma.split("  ")[0];
-        String periodoEAno = turmaSemId.split("  ")[2] + " " + turma.split("  ")[1];
+        String periodoEAno = turma.split("  ")[2] + " " + turma.split("  ")[1];
 
         tvDisciplina.setText(disciplina);
         tvPeriodoEAno.setText(periodoEAno);

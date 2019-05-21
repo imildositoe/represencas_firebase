@@ -31,7 +31,7 @@
         android:layout_marginLeft="4dp"
         android:text="Participante"
         app:layout_constraintBottom_toTopOf="@+id/guideline12"
-        app:layout_constraintEnd_toStartOf="@+id/tv_percentagem_faltas"
+        app:layout_constraintEnd_toStartOf="@+id/tv_id_est_participante"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/img_photo_est"
         app:layout_constraintTop_toBottomOf="@+id/tv_nome_estudante" />
@@ -55,7 +55,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/tv_is_participante"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_nome_estudante"
-        app:srcCompat="@drawable/googleg_standard_color_18" />
+        app:srcCompat="@drawable/googleg_disabled_color_18"/>
 
     <TextView
         android:id="@+id/tv_nr_faltas"
@@ -65,7 +65,7 @@
         android:layout_marginRight="4dp"
         android:paddingLeft="2dp"
         android:paddingRight="2dp"
-        android:text="10 Faltas"
+        android:text="0 Faltas"
         app:layout_constraintBottom_toBottomOf="@+id/tv_nome_estudante"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -81,9 +81,28 @@
         android:layout_marginBottom="8dp"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="5 %"
+        android:text="0 %"
         app:layout_constraintBottom_toBottomOf="@+id/tv_is_participante"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tv_id_est_participante"
+        app:layout_constraintTop_toTopOf="@+id/tv_is_participante" />
+
+    <TextView
+        android:id="@+id/tv_id_est_participante"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="0"
+        android:textAlignment="textEnd"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_is_participante"
+        app:layout_constraintEnd_toStartOf="@+id/tv_percentagem_faltas"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/tv_is_participante"
         app:layout_constraintTop_toTopOf="@+id/tv_is_participante" />

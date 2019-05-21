@@ -31,7 +31,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:text="presente"
+        android:text="Presente"
         app:layout_constraintBottom_toTopOf="@+id/guideline12"
         app:layout_constraintEnd_toStartOf="@+id/cb_is_presente"
         app:layout_constraintStart_toEndOf="@+id/img_photo_est_marcacao"
@@ -53,10 +53,11 @@
         android:contentDescription="@null"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="@+id/tv_is_presente_marcacao"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_nome_estudante_marcacao"
-        app:srcCompat="@drawable/googleg_standard_color_18" />
+        app:srcCompat="@drawable/googleg_disabled_color_18"/>
 
     <CheckBox
         android:id="@+id/cb_is_presente"

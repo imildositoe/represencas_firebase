@@ -40,12 +40,8 @@ public class ProfControlePresencaStart extends AppCompatActivity {
     private Spinner spinnerTurmas;
     private ListView listViewSala;
     public static final String ID_SALA = "id";
-    public static final String ID_DISCIPLINA = "id_disciplina";
     public static final String SELECTED_ITEM = "selected_item";
-    public static final String ID_ALOCACAO = "id_alocacao";
     public static final String PR_LOGADO = "professor_logado";
-    public static String idDisciplina;
-    public static String idAlocacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +69,6 @@ public class ProfControlePresencaStart extends AppCompatActivity {
                 Intent intent = new Intent(ProfControlePresencaStart.this, ProfControleEstatisticasPresenca.class);
                 intent.putExtra(ID_SALA, sala.getId());
                 intent.putExtra(SELECTED_ITEM, spinnerTurmas.getSelectedItem().toString());
-                intent.putExtra(ID_DISCIPLINA, idDisciplina);
-                intent.putExtra(ID_ALOCACAO, idAlocacao);
                 intent.putExtra(PR_LOGADO, extras);
                 startActivity(intent);
             }
@@ -110,7 +104,7 @@ public class ProfControlePresencaStart extends AppCompatActivity {
     }
 
     private void retrieveTurmas() {
-        final List<Alocacao> list = new LinkedList<>();
+        final List<Alocacao> listAlocacoes = new LinkedList<>();
         Intent intent = getIntent();
         String[] extras = intent.getStringArrayExtra(LoginActivity.PR_LOGADO);
         final Docente docenteLogado = new Docente(extras[0], extras[1], extras[2], extras[3]);
@@ -119,22 +113,24 @@ public class ProfControlePresencaStart extends AppCompatActivity {
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                list.clear();
+                listAlocacoes.clear();
                 for (DataSnapshot d : dataSnapshot.getChildren()) {
                     Alocacao alocacao = d.getValue(Alocacao.class);
                     /* Pegar alocacoes(turmas) que fazem parte do docente logado*/
                     assert alocacao != null;
-                    if (docenteLogado.getId().equals(alocacao.getId_docente()) && alocacao.getAno() == 2019
+                    if (docenteLogado.getId().equals(alocacao.getId_docente())
+                            && alocacao.getAno() == Calendar.getInstance().get(Calendar.YEAR)
                             && alocacao.isEstado_semestre()) {
-                        list.add(alocacao);
+                        listAlocacoes.add(alocacao);
                     }
                 }
 
-                /*Helper loop to create string array*/
+                //Helper loop to create string array
                 final LinkedList<String> helper = new LinkedList<>();
-                for (final Alocacao a : list) {
+                for (final Alocacao aloc : listAlocacoes) {
 
-                    Query queryDisciplinas = raiz.child("disciplina").orderByChild("id").equalTo(a.getId_disciplina());
+                    //Join para achar o nome da disciplina
+                    Query queryDisciplinas = raiz.child("disciplina").orderByChild("id").equalTo(aloc.getId_disciplina());
                     queryDisciplinas.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -142,11 +138,9 @@ public class ProfControlePresencaStart extends AppCompatActivity {
                                 Disciplina disciplina = d.getValue(Disciplina.class);
                                 assert disciplina != null;
                                 char idDisc = disciplina.getId().charAt(disciplina.getId().length() - 1);
-                                String turma = disciplina.getDesignacao() + "  " + a.getAno() + "  " + a.getPeriodo() + idDisc;
+                                char idAloc = aloc.getId().charAt(aloc.getId().length() - 1);
+                                String turma = disciplina.getDesignacao() + "  " + aloc.getAno() + "  " + aloc.getPeriodo() + "  " + idDisc + "  " + idAloc;
                                 helper.add(turma);
-
-                                idDisciplina = disciplina.getId();
-                                idAlocacao = a.getId();
 
                                 String[] arraySpinner = new String[helper.size()];
                                 for (int i = 0; i < helper.size(); i++) {

@@ -3,20 +3,27 @@ package com.example.root.re_presencas.professor_activities.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.root.re_presencas.R;
+import com.example.root.re_presencas.model.Estudante;
 import com.example.root.re_presencas.professor_activities.fragments.ProfEstPresencaParticipantesFragment;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -42,7 +49,7 @@ public class ProfEstPresencaSelecionado extends AppCompatActivity {
         setContentView(R.layout.activity_prof_est_presenca_selecionado);
 
         raiz = FirebaseDatabase.getInstance().getReference();
-        //imgFotoParticipante = findViewById(R.id.img_foto_participante);
+        imgFotoParticipante = findViewById(R.id.img_foto_participante);
         tvNomePart = findViewById(R.id.tv_nome_participante);
         tvIsPart = findViewById(R.id.tv_is_presente_marcacao);
         tvAulasTotalPart = findViewById(R.id.tv_aulas_total_part);
@@ -63,6 +70,7 @@ public class ProfEstPresencaSelecionado extends AppCompatActivity {
         String isParticipante = intent.getStringExtra(ProfEstPresencaParticipantesFragment.IS_PARTICIPANTE);
         String nrFaltas = intent.getStringExtra(ProfEstPresencaParticipantesFragment.NR_FALTAS);
         String percent = intent.getStringExtra(ProfEstPresencaParticipantesFragment.PERCENTAGEM);
+        String idEstSel = intent.getStringExtra(ProfEstPresencaParticipantesFragment.ID_EST_SELECIONADO);
         int faltas = Integer.parseInt(nrFaltas);
         int percentagem = Integer.parseInt(percent);
         //int aulas = (faltas * 100) / percentagem; //Tratar a divisao por zero, para estudantes sem faltas(percentagem=0)
@@ -75,6 +83,28 @@ public class ProfEstPresencaSelecionado extends AppCompatActivity {
         tvAulasTotalPart.setText(aulasTotalText);
         tvFaltasCometidasPart.setText(nrFaltas);
         tvFaltasRemanescentesPart.setText(faltasRemanText);
+
+        Query queryEstudantes = raiz.child("estudante").orderByChild("id").equalTo(idEstSel);
+        queryEstudantes.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    Estudante estudante = d.getValue(Estudante.class);
+                    assert estudante != null;
+                    Picasso.with(ProfEstPresencaSelecionado.this)
+                            .load(estudante.getFoto())
+                            .placeholder(R.drawable.ic_launcher_background)
+                            .fit()
+                            .centerCrop()
+                            .into(imgFotoParticipante);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Error", databaseError.toString());
+            }
+        });
 
 
         //Grafico

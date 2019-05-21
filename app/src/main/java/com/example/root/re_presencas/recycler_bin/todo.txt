@@ -1,4 +1,9 @@
 // File to store future features, bugs to fix, etc.
 
+<< Resolvidos >>
+2. Arranjar o bug do nome(Imildo) que aparece no controle das marcacoes quando logado como cachimo@uem |resolvido|
+
+
+
+<< Por resolver >>
 1. Arranjar o bug que acontece no user Silva ao activar-se a sessao de presencas
-2. Arranjar o bug do nome(Imildo) que aparece no controle das marcacoes quando logado como cachimo@uem

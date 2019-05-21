@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.Switch;
 
 import com.example.root.re_presencas.R;
 import com.example.root.re_presencas.all.adapters.ListViewMarcacao;
+import com.example.root.re_presencas.estudante_activities._a.fragments.EstPresencasMarcacaoFragment;
 import com.example.root.re_presencas.login.LoginActivity;
 import com.example.root.re_presencas.model.Alocacao;
 import com.example.root.re_presencas.model.Aula;
@@ -113,8 +115,11 @@ public class ProfContPresencaControleFragment extends Fragment {
 
                                             marcacaoList.add(marcacao);
                                         }
-                                        ListViewMarcacao adapter = new ListViewMarcacao(getActivity(), marcacaoList);
-                                        listViewControleProf.setAdapter(adapter);
+                                        try {
+                                            ListViewMarcacao adapter = new ListViewMarcacao(getActivity(), marcacaoList);
+                                            listViewControleProf.setAdapter(adapter);
+                                        }catch (NullPointerException e) {
+                                        }
                                     }
 
                                     @Override
@@ -168,7 +173,8 @@ public class ProfContPresencaControleFragment extends Fragment {
                             String id = raiz.push().getKey();
                             idAula = id;
                             String idSala = intent.getStringExtra(ProfControlePresencaStart.ID_SALA);
-                            String idAlocacao = intent.getStringExtra(ProfControlePresencaStart.ID_ALOCACAO);
+                            String item = intent.getStringExtra(ProfControlePresencaStart.SELECTED_ITEM);
+                            String idAlocacao = "alocacao" + item.split("  ")[4];
                             Aula aula = new Aula(id, idSala, idAlocacao, getDataActual(), false);
                             assert id != null;
                             raiz.child("aula").child(id).setValue(aula);
@@ -202,6 +208,7 @@ public class ProfContPresencaControleFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int which) {
                             swSelarMarcacao.setChecked(true);
                             raiz.child("aula").child(idAula).child("is_selado").setValue(true);
+                            EstPresencasMarcacaoFragment.sessionClosed(idAula);
                         }
                     });
                     AlertDialog dialog = builder.create();

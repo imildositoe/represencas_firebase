@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -51,11 +52,12 @@ public class ListViewParticipantes extends ArrayAdapter<Inscricao> {
 
         raiz = FirebaseDatabase.getInstance().getReference();
         intent = context.getIntent();
-        ImageView imgPhotoEst = view.findViewById(R.id.img_photo_est);
+        final ImageView imgPhotoEst = view.findViewById(R.id.img_photo_est);
         final TextView tvNomeEst = view.findViewById(R.id.tv_nome_estudante);
         TextView tvIsParticipante = view.findViewById(R.id.tv_is_participante);
         final TextView tvNrFaltas = view.findViewById(R.id.tv_nr_faltas);
         final TextView tvPercentagemFaltas = view.findViewById(R.id.tv_percentagem_faltas);
+        final TextView tvIdPart = view.findViewById(R.id.tv_id_est_participante);
 
         final Inscricao inscricao = mData.get(position);
 
@@ -69,6 +71,13 @@ public class ListViewParticipantes extends ArrayAdapter<Inscricao> {
                     assert estudante != null;
                     if (estudante.getId().equals(inscricao.getId_estudante())) {
                         tvNomeEst.setText(estudante.getNome());
+                        tvIdPart.setText(estudante.getId());
+                        Picasso.with(context)
+                                .load(estudante.getFoto())
+                                .placeholder(R.drawable.googleg_disabled_color_18)
+                                .fit()
+                                .centerCrop()
+                                .into(imgPhotoEst);
                     }
                 }
             }

@@ -53,7 +53,7 @@ import java.util.Objects;
  */
 public class EstPresencasMarcacaoFragment extends Fragment {
 
-    private DatabaseReference raiz;
+    private static final DatabaseReference raiz = FirebaseDatabase.getInstance().getReference();
     private FingerprintManager fingerprintManager;
     private KeyguardManager keyguardManager;
     private Switch swIsMarcado;
@@ -72,27 +72,37 @@ public class EstPresencasMarcacaoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_est_presencas_marcacao, container, false);
 
-        raiz = FirebaseDatabase.getInstance().getReference();
-        fingerprintManager = (FingerprintManager) Objects.requireNonNull(getActivity()).getSystemService(
-                Context.FINGERPRINT_SERVICE);
-        keyguardManager = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+//        raiz = FirebaseDatabase.getInstance().getReference();
+        try {
+            fingerprintManager = (FingerprintManager) Objects.requireNonNull(getActivity()).getSystemService(
+                    Context.FINGERPRINT_SERVICE);
+            keyguardManager = (KeyguardManager) Objects.requireNonNull(getActivity()).getSystemService(Context.KEYGUARD_SERVICE);
+            intent = Objects.requireNonNull(getActivity()).getIntent();
+        } catch (NoClassDefFoundError | NullPointerException e) {
+        }
+
         swIsMarcado = view.findViewById(R.id.sw_is_marcado);
         imgFinger = view.findViewById(R.id.img_finger);
         tvCadeira = view.findViewById(R.id.tv_cadeira_est_marc);
         tvPeriodo = view.findViewById(R.id.tv_periodo_est_marc);
         tvNome = view.findViewById(R.id.tv_nome_est_marc);
-        intent = getActivity().getIntent();
 
         //Starting FingerPrint here
-        this.startFingerPrint();
-        this.imgFingerClick();
-        this.sessionOpened();
-        this.getIdInscicao();
-        this.sessionClosed();
+        try {
+            this.startFingerPrint();
+            this.imgFingerClick();
+            this.sessionOpened();
+            this.getIdInscicao();
+        } catch (NullPointerException e) {
+        }
 
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
 
     /**
      * Para recuperar o id da inscricao do estudante logado
@@ -172,11 +182,14 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                                                     //Verificacao para abrir a sessao para o estudante logado  android:exported="true"
                                                     if (idEstudante.equals(inscricao.getId_estudante())) {
 
-                                                        NotificationGenerator.openActivityNotification(
-                                                                Objects.requireNonNull(getActivity()).getApplicationContext(),
-                                                                "Sessão de marcação de presenças aberta",
-                                                                "Começar"
-                                                        );
+                                                        try {
+                                                            NotificationGenerator.openActivityNotification(
+                                                                    Objects.requireNonNull(getActivity()).getApplicationContext(),
+                                                                    "Sessão de marcação de presenças aberta",
+                                                                    "Começar"
+                                                            );
+                                                        } catch (NullPointerException e) {
+                                                        }
 
                                                         EstPresenca.disableTab(0, true, 0, true);
 
@@ -185,8 +198,7 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                                                         tvPeriodo.setText(alocacao.getPeriodo());
 
                                                         //Para setar o nome da disciplina em cada estudante da turma
-                                                        Query query3 = raiz.child("disciplina")
-                                                                .orderByChild("id").equalTo(alocacao.getId_disciplina());
+                                                        Query query3 = raiz.child("disciplina").orderByChild("id").equalTo(alocacao.getId_disciplina());
                                                         query3.addValueEventListener(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -233,7 +245,6 @@ public class EstPresencasMarcacaoFragment extends Fragment {
 
                                                     //Verificacao para fechar a sessao para o estudante logado
                                                     if (idEstudante.equals(inscricao.getId_estudante())) {
-
                                                         EstPresenca.disableTab(0, false, 1, false);
                                                     }
                                                 }
@@ -267,9 +278,10 @@ public class EstPresencasMarcacaoFragment extends Fragment {
 
     /**
      * Metodo para verificar estudantes que nao marcaram as presencas e atribuir-los faltas
-     * */
-    private void sessionClosed() {
-        Query query = raiz.child("aula").orderByChild("id").equalTo(idAula);
+     */
+    public static void sessionClosed(final String aula_id) {
+        Log.e("Entramos", aula_id);
+        Query query = raiz.child("aula").orderByChild("id").equalTo(aula_id);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -278,7 +290,7 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                     assert aula != null;
 
                     final LinkedList<String> idInscricoes = new LinkedList<>();
-                    Query query1 = raiz.child("marcacao").orderByChild("id_aula").equalTo(idAula);
+                    Query query1 = raiz.child("marcacao").orderByChild("id_aula").equalTo(aula_id);
                     query1.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -322,15 +334,21 @@ public class EstPresencasMarcacaoFragment extends Fragment {
                                                     && inscricao.getPeriodo().equals(alocacao.getPeriodo())
                                                     && inscricao.getAno() == Calendar.getInstance().get(Calendar.YEAR)) {
 
-                                                for (String idInsc : idInscricoes) {
-                                                    //verifica as inscricoes que nao marcaram presencas para poder DAR FALTA
-                                                    if (!idInsc.equals(inscricao.getId())) {
 
-                                                        String idMarcacao = raiz.push().getKey();
-                                                        Marcacao marcacao = new Marcacao(idMarcacao, idAula, idInscricao, false, getDataActual());
-                                                        assert idMarcacao != null;
-                                                        raiz.child("marcacao").child(idMarcacao).setValue(marcacao);
+                                                LinkedList<String> idsNaoMarcados = new LinkedList<>();
+                                                boolean flag = false;
+                                                for (String idInsc : idInscricoes) {//marco, silva
+                                                    //verifica as inscricoes que nao marcaram presencas para poder DAR FALTA
+                                                    if (idInsc.equals(inscricao.getId())) {
+                                                        flag = true;
                                                     }
+                                                }
+
+                                                if (!flag) {
+                                                    String idMarcacao = raiz.push().getKey();
+                                                    Marcacao marcacao = new Marcacao(idMarcacao, aula_id, inscricao.getId(), false, getDataActual());
+                                                    assert idMarcacao != null;
+                                                    raiz.child("marcacao").child(idMarcacao).setValue(marcacao);
                                                 }
                                             }
                                         }
@@ -359,9 +377,6 @@ public class EstPresencasMarcacaoFragment extends Fragment {
         });
     }
 
-    private int getNrMarcacoesPorDia() {
-        return 0;
-    }
 
     @SuppressLint({"SetTextI18n", "ResourceAsColor"})
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -379,7 +394,7 @@ public class EstPresencasMarcacaoFragment extends Fragment {
         Toast.makeText(getContext(), "Presença marcada com sucesso!", Toast.LENGTH_SHORT).show();
     }
 
-    private String getDataActual() {
+    private static String getDataActual() {
         GregorianCalendar c = (GregorianCalendar) GregorianCalendar.getInstance();
         int dia = c.get(GregorianCalendar.DAY_OF_MONTH);
         int mes = c.get(GregorianCalendar.MONTH) + 1;
@@ -393,7 +408,7 @@ public class EstPresencasMarcacaoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(), "Coloque o dedo no sensor para marcar a presença!", Toast.LENGTH_SHORT).show();
-                //savePresenca();
+//                savePresenca();
             }
         });
     }

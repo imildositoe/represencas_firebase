@@ -20,10 +20,15 @@ import android.widget.Toast;
 import com.example.root.re_presencas.R;
 import com.example.root.re_presencas.estudante_activities._a.activities.EstPresenca;
 import com.example.root.re_presencas.login.LoginActivity;
+import com.example.root.re_presencas.model.Estudante;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -45,6 +50,7 @@ public class EstudanteMenu extends AppCompatActivity {
     private DatabaseReference raiz;
     private StorageTask mUploadTask;
     private String[] extras;
+    private String fotoEstLogado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +64,48 @@ public class EstudanteMenu extends AppCompatActivity {
         raiz = FirebaseDatabase.getInstance().getReference();
         extras = intent.getStringArrayExtra(LoginActivity.EST_LOGADO);
 
+        tvNomeEstudantePerfil.setText(extras[1]);
         chooseImage();
         uploadClick();
 
-
         this.start();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        this.renderPhoto();
+    }
+
+    private void renderPhoto() {
+        try {
+            String idLogado = extras[0];
+            Query query = raiz.child("estudante").orderByChild("id").equalTo(idLogado);
+            query.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        Estudante estudante = d.getValue(Estudante.class);
+                        assert estudante != null;
+
+                        Picasso.with(EstudanteMenu.this)
+                                .load(estudante.getFoto())
+                                .placeholder(R.drawable.ic_launcher_background)
+                                .fit()
+                                .centerCrop()
+                                .into(imgPerfilEst);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } catch (RuntimeException e) {
+            Log.e("Render Image", e.toString());
+        }
     }
 
     private void chooseImage() {
@@ -79,7 +122,7 @@ public class EstudanteMenu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (mUploadTask != null && mUploadTask.isInProgress()) {
-                    Toast.makeText(EstudanteMenu.this, "Upload is in progress", Toast.LENGTH_LONG).show();
+                    Toast.makeText(EstudanteMenu.this, "Upload esta em progresso...", Toast.LENGTH_LONG).show();
                 } else {
                     uploadImage();
                 }
@@ -111,17 +154,45 @@ public class EstudanteMenu extends AppCompatActivity {
 
     private void uploadImage() {
         if (imgUri != null) {
-            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
+            final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
             mUploadTask = fileReference.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @TargetApi(Build.VERSION_CODES.KITKAT)
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                    // Tem que pegar o estudante logado e fazer um update do campo foto e colocar a url
-                    Toast.makeText(EstudanteMenu.this, "Upload successfully", Toast.LENGTH_SHORT).show();
-                    String urlFoto = Objects.requireNonNull(taskSnapshot.getUploadSessionUri()).toString();
-                    String idLogado = extras[0];
-                    raiz.child("estudante").child(idLogado).child("foto").setValue(urlFoto);
+                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Tem que pegar o estudante logado e fazer um update do campo foto e colocar a url
+                            String urlFoto = Objects.requireNonNull(uri.toString());
+                            String idLogado = extras[0];
+                            raiz.child("estudante").child(idLogado).child("foto").setValue(urlFoto);
+                            Toast.makeText(EstudanteMenu.this, "Upload feito com sucesso.", Toast.LENGTH_SHORT).show();
 
+
+                            Query query = raiz.child("estudante").orderByChild("id").equalTo(idLogado);
+                            query.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                        Estudante estudante = d.getValue(Estudante.class);
+                                        assert estudante != null;
+
+                                        Picasso.with(EstudanteMenu.this)
+                                                .load(estudante.getFoto())
+                                                .placeholder(R.drawable.ic_launcher_background)
+                                                .fit()
+                                                .centerCrop()
+                                                .into(imgPerfilEst);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    });
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
